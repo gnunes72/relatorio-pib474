@@ -3,198 +3,179 @@ from datetime import date
 import pandas as pd
 from io import BytesIO
 import urllib.parse
+from PIL import Image
+import os
 
-# Configuração visual
-st.set_page_config(page_title="Relatório PIB474", page_icon="🌿", layout="centered")
+# --- CONFIGURAÇÃO DA PÁGINA ---
+st.set_page_config(page_title="Relatório PIB Floripa", page_icon="⛪", layout="centered")
 
-# Cores em tons de verde - CORREÇÃO: unsafe_allow_html
+# --- DESIGN E ESTILIZAÇÃO CSS PROFISSIONAL ---
 st.markdown("""
     <style>
     .stApp { background-color: #ffffff; }
-    .stButton>button { background-color: #2e7d32; color: white; width: 100%; border-radius: 8px; }
-    .stExpander { border: 2px solid #a5d6a7; border-radius: 10px; background-color: #f1f8e9; }
-    h1, h2, h3 { color: #1b5e20; }
-    label { color: #2e7d32 !important; font-weight: bold; }
+    
+    /* Cabeçalho Principal */
+    .pib-header-title { color: #004d40; font-size: 42px !important; font-weight: 800; margin-bottom: 0px; text-align: center; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    .pib-header-subtitle { color: #004d40; font-size: 19px !important; font-weight: 400; margin-top: -10px; margin-bottom: 5px; text-align: center; }
+    .pib-rel-title { color: #2e7d32; font-size: 15px !important; text-align: center; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 25px; }
+    
+    /* Subtítulos com Faixa Verde Escuro e Texto Branco */
+    .pib-faixa {
+        background-color: #004d40;
+        color: #ffffff !important;
+        padding: 6px 15px;
+        border-radius: 4px;
+        font-size: 15px !important;
+        font-weight: 600;
+        margin-top: 20px;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        box-shadow: 0px 2px 4px rgba(0,0,0,0.1);
+    }
+
+    /* Containers de Entrada (Verde Claríssimo) */
+    .stExpander { border: 1px solid #a5d6a7; border-radius: 10px; background-color: #f1f8e9; margin-bottom: 15px; }
+    
+    /* Labels e Botões */
+    label { color: #004d40 !important; font-weight: 700 !important; font-size: 14px !important; }
+    .stButton>button { background-color: #004d40; color: white; border-radius: 8px; font-weight: bold; transition: 0.3s; }
+    .stButton>button:hover { background-color: #2e7d32; border-color: #2e7d32; }
+    
+    /* Ajuste de inputs numéricos */
+    .stNumberInput div div input { background-color: #ffffff !important; }
     </style>
     """, unsafe_allow_html=True)
 
-SENHA_CORRETA = "PIB474" 
+# --- SISTEMA DE SENHA (MAIÚSCULAS/MINÚSCULAS) ---
+senha_usuario = st.sidebar.text_input("🔐 Autenticação:", type="password")
 
-st.sidebar.title("🔐 Acesso")
-senha = st.sidebar.text_input("Senha:", type="password")
-
-if senha == SENHA_CORRETA:
-    st.title("🌿 Relatório de Cultos PIB474")
+if senha_usuario.upper() == "PIB474":
     
-    # --- CULTO 09:00 ---
-    with st.expander("🟢 CULTO DAS 09:00h - Clique para preencher", expanded=True):
-        resp_9 = st.text_input("Responsável pela contagem (9h)", value="")
-        data_9 = st.date_input("Data (9h)", value=None, format="DD/MM/YYYY")
+    # --- CABEÇALHO COM LOGO ---
+    col_logo, col_nome = st.columns([1, 3.5])
+    with col_logo:
+        if os.path.exists("logo.png"):
+            st.image(Image.open("logo.png"), width=110)
+    with col_nome:
+        st.markdown('<p class="pib-header-title">PIB FLORIPA</p>', unsafe_allow_html=True)
+        st.markdown('<p class="pib-header-subtitle">Primeira Igreja Batista de Florianópolis</p>', unsafe_allow_html=True)
+        st.markdown('<p class="pib-rel-title">Relatório de Cultos</p>', unsafe_allow_html=True)
+    
+    # --- FORMULÁRIO CULTO 09:00 ---
+    with st.expander("🟢 CULTO DAS 09:00h - Preencher Dados", expanded=True):
+        r9 = st.text_input("Responsável pela contagem (9h)", placeholder="Digite o nome...")
+        d9_input = st.date_input("Data do Culto (9h)", value=None, format="DD/MM/YYYY")
         
-        st.markdown("### 👥 Compareceram:")
+        st.markdown('<div class="pib-faixa">👥 Compareceram</div>', unsafe_allow_html=True)
         c1, c2, c3 = st.columns(3)
-        temp_9 = c1.number_input("Templo e mezanino", min_value=0, key="t9")
-        vis_9 = c2.number_input("Visitantes", min_value=0, key="v9")
-        sex_9 = c3.number_input("Sexto andar", min_value=0, key="s9")
+        t9 = c1.number_input("Templo/Mezanino", min_value=0, key="t9")
+        v9 = c2.number_input("Visitantes", min_value=0, key="v9")
+        s9 = c3.number_input("Sexto andar", min_value=0, key="s9")
         
-        st.markdown("### 🛠️ Servindo:")
+        st.markdown('<div class="pib-faixa">🛠️ Servindo</div>', unsafe_allow_html=True)
         s1, s2, s3 = st.columns(3)
-        dia_9 = s1.number_input("Diaconia", min_value=0, key="d9")
-        mes_9 = s2.number_input("Mesa", min_value=0, key="m9")
-        lou_9 = s3.number_input("Louvor", min_value=0, key="l9")
+        di9 = s1.number_input("Diaconia", min_value=0, key="di9")
+        me9 = s2.number_input("Mesa", min_value=0, key="me9")
+        lo9 = s3.number_input("Louvor", min_value=0, key="lo9")
 
-        st.markdown("### 👶 MI:")
+        st.markdown('<div class="pib-faixa">🎒 MI (Ministério Infantil)</div>', unsafe_allow_html=True)
         mi1, mi2, mi3 = st.columns(3)
-        mi_c_9 = mi1.number_input("Crianças (MI 9h)", min_value=0)
-        mi_s_9 = mi2.number_input("Servos (MI 9h)", min_value=0)
-        mi_p_9 = mi3.number_input("Pai/Mãe (MI 9h)", min_value=0)
+        mic9 = mi1.number_input("Crianças (MI)", min_value=0, key="mic9")
+        mis9 = mi2.number_input("Servos (MI)", min_value=0, key="mis9")
+        mip9 = mi3.number_input("Pai/Mãe (MI)", min_value=0, key="mip9")
 
-        st.markdown("### 🧒 MPA:")
+        st.markdown('<div class="pib-faixa">🎮 MPA (Pré-Adolescente)</div>', unsafe_allow_html=True)
         mp1, mp2, mp3 = st.columns(3)
-        mpa_c_9 = mp1.number_input("Crianças (MPA 9h)", min_value=0)
-        mpa_s_9 = mp2.number_input("Servos (MPA 9h)", min_value=0)
-        mpa_p_9 = mp3.number_input("Pai/Mãe (MPA 9h)", min_value=0)
+        mpac9 = mp1.number_input("Crianças (MPA)", min_value=0, key="mpac9")
+        mpas9 = mp2.number_input("Servos (MPA)", min_value=0, key="mpas9")
+        mpap9 = mp3.number_input("Pai/Mãe (MPA)", min_value=0, key="mpap9")
         
-        ebed_9 = st.number_input("Ebed", min_value=0)
+        st.markdown('<div class="pib-faixa">📚 Ebed</div>', unsafe_allow_html=True)
+        eb9 = st.number_input("Total Ebed", min_value=0, key="eb9", label_visibility="collapsed")
 
-    # --- CULTO 11:00 ---
-    with st.expander("🟢 CULTO DAS 11:00h - Clique para preencher", expanded=False):
-        resp_11 = st.text_input("Responsável pela contagem (11h)", value="")
-        data_11 = st.date_input("Data (11h)", value=None, format="DD/MM/YYYY")
+    # --- FORMULÁRIO CULTO 11:00 ---
+    with st.expander("🟢 CULTO DAS 11:00h - Preencher Dados", expanded=False):
+        r11 = st.text_input("Responsável pela contagem (11h)", placeholder="Digite o nome...")
+        d11_input = st.date_input("Data do Culto (11h)", value=None, format="DD/MM/YYYY")
         
-        st.markdown("### 👥 Compareceram:")
+        st.markdown('<div class="pib-faixa">👥 Compareceram</div>', unsafe_allow_html=True)
         c4, c5, c6 = st.columns(3)
-        temp_11 = c4.number_input("Templo e mezanino ", min_value=0, key="t11")
-        vis_11 = c5.number_input("Visitantes ", min_value=0, key="v11")
-        sex_11 = c6.number_input("Sexto andar ", min_value=0, key="s11")
+        t11 = c4.number_input("Templo/Mezanino ", min_value=0, key="t11")
+        v11 = c5.number_input("Visitantes ", min_value=0, key="v11")
+        s11 = c6.number_input("Sexto andar ", min_value=0, key="s11")
         
-        st.markdown("### 🛠️ Servindo:")
+        st.markdown('<div class="pib-faixa">🛠️ Servindo</div>', unsafe_allow_html=True)
         s4, s5, s6 = st.columns(3)
-        dia_11 = s4.number_input("Diaconia ", min_value=0, key="d11")
-        mes_11 = s5.number_input("Mesa ", min_value=0, key="m11")
-        lou_11 = s6.number_input("Louvor ", min_value=0, key="l11")
+        di11 = s4.number_input("Diaconia ", min_value=0, key="di11")
+        me11 = s5.number_input("Mesa ", min_value=0, key="me11")
+        lo11 = s6.number_input("Louvor ", min_value=0, key="lo11")
 
-        st.markdown("### 👶 MI (11h):")
+        st.markdown('<div class="pib-faixa">🎒 MI (Ministério Infantil 11h)</div>', unsafe_allow_html=True)
         mi4, mi5, mi6 = st.columns(3)
-        mi_c_11 = mi4.number_input("Crianças (MI 11h)", min_value=0)
-        mi_s_11 = mi5.number_input("Servos (MI 11h)", min_value=0)
-        mi_p_11 = mi6.number_input("Pai/Mãe (MI 11h)", min_value=0)
+        mic11 = mi4.number_input("Crianças (MI 11h)", min_value=0, key="mic11")
+        mis11 = mi5.number_input("Servos (MI 11h)", min_value=0, key="mis11")
+        mip11 = mi6.number_input("Pai/Mãe (MI 11h)", min_value=0, key="mip11")
 
-        st.markdown("### 🎓 Classe Batismo:")
+        st.markdown('<div class="pib-faixa">🎓 Classe Batismo</div>', unsafe_allow_html=True)
         ba1, ba2, ba3 = st.columns(3)
-        bat_j = ba1.number_input("Jovens", min_value=0)
-        bat_a = ba2.number_input("Adultos", min_value=0)
-        bat_s = ba3.number_input("Servos ", min_value=0)
+        bj = ba1.number_input("Jovens", min_value=0)
+        ba = ba2.number_input("Adultos", min_value=0)
+        bs = ba3.number_input("Servos ", min_value=0)
 
-    # --- CÁLCULOS ---
-    t_comp_9 = temp_9 + vis_9 + sex_9
-    t_serv_9 = dia_9 + mes_9 + lou_9
-    t_mi_9 = mi_c_9 + mi_s_9 + mi_p_9
-    t_mpa_9 = mpa_c_9 + mpa_s_9 + mpa_p_9
-    total_9h = t_comp_9 + t_serv_9 + t_mi_9 + t_mpa_9 + ebed_9
+    # --- PROCESSAMENTO ---
+    tot_comp9 = t9+v9+s9
+    tot_serv9 = di9+me9+lo9
+    tot_mi9 = mic9+mis9+mip9
+    tot_mpa9 = mpac9+mpas9+mpap9
+    tot_9h = tot_comp9 + tot_serv9 + tot_mi9 + tot_mpa9 + eb9
 
-    t_comp_11 = temp_11 + vis_11 + sex_11
-    t_serv_11 = dia_11 + mes_11 + lou_11
-    t_mi_11 = mi_c_11 + mi_s_11 + mi_p_11
-    t_bat_11 = bat_j + bat_a + bat_s
-    total_11h = t_comp_11 + t_serv_11 + t_mi_11 + t_bat_11
-    total_geral = total_9h + total_11h
-
-    st.markdown("---")
+    tot_comp11 = t11+v11+s11
+    tot_serv11 = di11+me11+lo11
+    tot_mi11 = mic11+mis11+mip11
+    tot_bat = bj+ba+bs
+    tot_11h = tot_comp11 + tot_serv11 + tot_mi11 + tot_bat
     
-    # Gerar Relatório Texto
-    dt9 = data_9.strftime('%d/%m/%Y') if data_9 else ""
-    dt11 = data_11.strftime('%d/%m/%Y') if data_11 else ""
+    # --- TEXTO FINAL ---
+    d9_str = d9_input.strftime('%d/%m/%Y') if d9_input else ""
+    d11_str = d11_input.strftime('%d/%m/%Y') if d11_input else ""
     
-    rel_texto = f"""Relatório dos cultos
+    relatorio = f"""Relatório de Cultos - PIB Floripa
 
 Culto das 9:00hrs
-
-Responsável pela contagem: {resp_9}
-Data: {dt9}
-Compareceram: 👥
-Templo e mezanino: {temp_9}
-Visitantes: {vis_9}
-Sexto andar: {sex_9}
-Total: {t_comp_9}
-
-Servindo:
-Diaconia: {dia_9}
-Mesa: {mes_9}
-Louvor: {lou_9}
-Total: {t_serv_9}
-
-MI:
-Crianças: {mi_c_9}
-Servos: {mi_s_9}
-Pai/Mãe: {mi_p_9}
-Total: {t_mi_9}
-
-MPA:
-Crianças: {mpa_c_9}
-Servos: {mpa_s_9}
-Pai/Mãe: {mpa_p_9}
-Total: {t_mpa_9}
-
-Ebed: {ebed_9}
-
-TOTAL DO CULTO DAS 9:00hrs: {total_9h}
+Responsável: {r9} | Data: {d9_str}
+Compareceram: 👥 | Total: {tot_comp9}
+Servindo: {tot_serv9} | MI: {tot_mi9} | MPA: {tot_mpa9}
+Ebed: {eb9}
+TOTAL 9h: {tot_9h}
 
 --------------------------------------
 
 Culto das 11:00hrs
+Responsável: {r11} | Data: {d11_str}
+Compareceram: 👥 | Total: {tot_comp11}
+Servindo: {tot_serv11} | MI: {tot_mi11} | Batismo: {tot_bat}
+TOTAL 11h: {tot_11h}
 
-Responsável pela contagem: {resp_11}
-Data: {dt11}
-Compareceram: 👥
-Templo e mezanino: {temp_11}
-Visitantes: {vis_11}
-Sexto andar: {sex_11}
-Total: {t_comp_11}
+TOTAL GERAL DO DIA: {tot_9h + tot_11h}"""
 
-Servindo:
-Diaconia: {dia_11}
-Mesa: {mes_11}
-Louvor: {lou_11}
-Total: {t_serv_11}
+    # --- BOTÕES ---
+    st.markdown("---")
+    col_w, col_x = st.columns(2)
+    with col_w:
+        wa_link = f"https://wa.me/?text={urllib.parse.quote(relatorio)}"
+        st.markdown(f'<a href="{wa_link}" target="_blank"><button style="width:100%; height:45px; background-color:#25D366; border:none; color:white; border-radius:10px; cursor:pointer; font-weight:bold; font-size:16px;">📲 WhatsApp</button></a>', unsafe_allow_html=True)
+    with col_x:
+        df_log = pd.DataFrame([{"Data": d9_str, "9h": tot_9h, "11h": tot_11h, "Total": tot_9h+tot_11h}])
+        buf = BytesIO()
+        with pd.ExcelWriter(buf, engine='xlsxwriter') as wr: df_log.to_excel(wr, index=False)
+        st.download_button("📥 Baixar Excel", buf.getvalue(), f"pib_{d9_str}.xlsx")
 
-MI
-Crianças: {mi_c_11}
-Servos: {mi_s_11}
-Pai/Mãe: {mi_p_11}
-Total: {t_mi_11}
-
-Classe batismo:
-Jovens: {bat_j}
-Adultos: {bat_a}
-Servos: {bat_s}
-Total: {t_bat_11}
-
-TOTAL DO CULTO DAS 11:00hrs: {total_11h}
-
-TOTAL GERAL: {total_geral}"""
-
-    # BOTÕES DE AÇÃO
-    col_wa, col_pla = st.columns(2)
-    
-    with col_wa:
-        txt_wa = urllib.parse.quote(rel_texto)
-        st.markdown(f'<a href="https://wa.me/?text={txt_wa}" target="_blank"><button style="width:100%; height:45px; background-color:#25D366; color:white; border:none; border-radius:10px; cursor:pointer; font-weight:bold;">📲 Enviar via WhatsApp</button></a>', unsafe_allow_html=True)
-    
-    with col_pla:
-        # Criando uma planilha mais detalhada para o Google Sheets
-        dados_planilha = {
-            "Item": ["Total 9h", "Total 11h", "GERAL", "Templo 9h", "Templo 11h", "Ebed", "MI Total 9h", "MI Total 11h"],
-            "Valores": [total_9h, total_11h, total_geral, temp_9, temp_11, ebed_9, t_mi_9, t_mi_11]
-        }
-        df = pd.DataFrame(dados_planilha)
-        output = BytesIO()
-        with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-            df.to_excel(writer, index=False)
-        st.download_button("📥 Baixar Planilha (Excel)", data=output.getvalue(), file_name=f"pib474_{dt9}.xlsx")
-
-    st.markdown("### 📋 Copiar Relatório Manualmente:")
-    st.code(rel_texto, language="text")
+    # --- CÓPIA MANUAL (ESCONDIDA) ---
+    with st.expander("📋 ABRIR CÓPIA MANUAL"):
+        st.code(relatorio, language="text")
 
 else:
-    st.info("Digite a senha PIB474 para liberar o relatório.")
+    st.markdown("<br><br>", unsafe_allow_html=True)
+    st.info("Por favor, insira a senha na barra lateral para acessar o sistema da PIB Floripa.")
