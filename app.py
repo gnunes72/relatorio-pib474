@@ -1,141 +1,136 @@
 import streamlit as st
 from datetime import date
-import pandas as pd
-from io import BytesIO
-import urllib.parse
-import os
 
-# --- CONFIGURAÇÃO DA PÁGINA ---
-st.set_page_config(page_title="PIB Floripa", page_icon="⛪", layout="centered")
+# Configuração da página
+st.set_page_config(page_title="Relatório de Cultos", page_icon="⛪", layout="centered")
 
-# --- ESTILIZAÇÃO CSS (PADRONIZAÇÃO RÍGIDA) ---
-st.markdown("""
-    <style>
-    .stApp { background-color: #ffffff; }
+# --- SISTEMA DE SENHA SIMPLES ---
+SENHA_CORRETA = "igreja123" # <--- ALTERE SUA SENHA AQUI
+
+st.sidebar.title("🔐 Acesso Restrito")
+senha_digitada = st.sidebar.text_input("Digite a senha para liberar o formulário:", type="password")
+
+if senha_digitada == SENHA_CORRETA:
+    st.sidebar.success("Acesso Liberado!")
     
-    .pib-header-title { color: #004d40; font-size: 38px !important; font-weight: 800; text-align: center; margin-bottom: 0px; }
-    .pib-header-subtitle { color: #004d40; font-size: 17px !important; text-align: center; margin-top: -10px; margin-bottom: 25px; }
-    
-    .pib-faixa {
-        background-color: #004d40;
-        color: #ffffff !important;
-        padding: 8px 15px;
-        border-radius: 6px;
-        font-size: 14px !important;
-        font-weight: 600;
-        margin-top: 15px;
-        margin-bottom: 12px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-    .pib-faixa-center { justify-content: center; text-transform: uppercase; }
+    st.title("⛪ Registro de Cultos")
+    st.write("Preencha os campos abaixo para gerar o relatório formatado.")
 
-    .stExpander { 
-        border: 1px solid #81c784; 
-        border-radius: 12px; 
-        background-color: #e3eedf !important; 
-        margin-bottom: 15px; 
-    }
-    
-    .stNumberInput div div input, .stTextInput div div input { 
-        background-color: #ffffff !important; 
-        border-radius: 8px !important;
-    }
-    
-    /* BOTÕES PADRONIZADOS: MESMA COR, ALTURA, FONTE E ÍCONE LATERAL */
-    .stButton>button, .btn-pib-link {
-        background-color: #004d40 !important;
-        color: white !important;
-        height: 50px !important;
-        width: 100% !important;
-        border-radius: 8px !important;
-        font-weight: bold !important;
-        font-size: 14px !important;
-        border: none !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        gap: 10px !important;
-        text-decoration: none !important;
-    }
-
-    label { color: #004d40 !important; font-weight: 700 !important; }
-    </style>
-    """, unsafe_allow_html=True)
-
-if st.sidebar.text_input("🔐 Acesso:", type="password").upper() == "PIB474":
-    
-    col_l, col_t = st.columns([1, 4])
-    with col_l:
-        if os.path.exists("logo.png"): st.image("logo.png", width=100)
-    with col_t:
-        st.markdown('<p class="pib-header-title">PIB FLORIPA</p>', unsafe_allow_html=True)
-        st.markdown('<p class="pib-header-subtitle">Primeira Igreja Batista de Florianópolis</p>', unsafe_allow_html=True)
-
-    # --- CULTO 09:00 (COMPLETO) ---
-    with st.expander("⛪ CULTO DAS 09:00h", expanded=True):
-        r9 = st.text_input("Responsável (9h)", key="r9")
-        d9 = st.date_input("Data (9h)", value=None, format="DD/MM/YYYY", key="d9")
+    # --- ENTRADA DE DADOS: 9:00h ---
+    with st.expander("📊 CLIQUE AQUI: Dados do Culto das 09:00h", expanded=True):
+        col1, col2 = st.columns(2)
+        with col1:
+            resp_9 = st.text_input("Responsável (9h)", value="Giovane")
+            data_9 = st.date_input("Data do Relatório", date.today())
+            templo_9 = st.number_input("Templo e Mezanino (9h)", min_value=0, step=1)
+            visitantes_9 = st.number_input("Visitantes (9h)", min_value=0, step=1)
+            sexto_9 = st.number_input("Sexto Andar (9h)", min_value=0, step=1)
+        with col2:
+            diaconia_9 = st.number_input("Diaconia (9h)", min_value=0, step=1)
+            mesa_9 = st.number_input("Mesa (9h)", min_value=0, step=1)
+            louvor_9 = st.number_input("Louvor (9h)", min_value=0, step=1)
         
-        st.markdown('<div class="pib-faixa pib-faixa-center">Compareceram</div>', unsafe_allow_html=True)
+        st.markdown("---")
+        st.subheader("Crianças e Apoio (9h)")
         c1, c2, c3 = st.columns(3)
-        t9 = c1.number_input("Templo", min_value=0, key="t9")
-        v9 = c2.number_input("Visitantes", min_value=0, key="v9")
-        s9 = c3.number_input("6º Andar", min_value=0, key="s9")
+        mi_c_9 = c1.number_input("MI Crianças", min_value=0, key="mic9")
+        mi_s_9 = c2.number_input("MI Servos", min_value=0, key="mis9")
+        mi_p_9 = c3.number_input("MI Pais", min_value=0, key="mip9")
         
-        st.markdown('<div class="pib-faixa">🤝 Servindo</div>', unsafe_allow_html=True)
-        sc1, sc2, sc3 = st.columns(3)
-        di9 = sc1.number_input("Diaconia", min_value=0, key="di9")
-        me9 = sc2.number_input("Mesa", min_value=0, key="me9")
-        lo9 = sc3.number_input("Louvor", min_value=0, key="lo9")
+        ca1, ca2, ca3 = st.columns(3)
+        mpa_c_9 = ca1.number_input("MPA Crianças", min_value=0, key="mpac9")
+        mpa_s_9 = ca2.number_input("MPA Servos", min_value=0, key="mpas9")
+        mpa_p_9 = ca3.number_input("MPA Pais", min_value=0, key="mpap9")
 
-        st.markdown('<div class="pib-faixa">🎒 MI (Infantil)</div>', unsafe_allow_html=True)
-        mi9 = st.number_input("Crianças (MI)", min_value=0, key="mi9")
+    # --- ENTRADA DE DADOS: 11:00h ---
+    with st.expander("📊 CLIQUE AQUI: Dados do Culto das 11:00h", expanded=False):
+        col3, col4 = st.columns(2)
+        with col3:
+            resp_11 = st.text_input("Responsável (11h)", value="Giovane")
+            templo_11 = st.number_input("Templo e Mezanino (11h)", min_value=0, step=1)
+            visitantes_11 = st.number_input("Visitantes (11h)", min_value=0, step=1)
+            sexto_11 = st.number_input("Sexto Andar (11h)", min_value=0, step=1)
+        with col4:
+            diaconia_11 = st.number_input("Diaconia (11h)", min_value=0, step=1)
+            mesa_11 = st.number_input("Mesa (11h)", min_value=0, step=1)
+            louvor_11 = st.number_input("Louvor (11h)", min_value=0, step=1)
         
-        st.markdown('<div class="pib-faixa">🎮 MPA (Pré-Adolescente)</div>', unsafe_allow_html=True)
-        mpa9 = st.number_input("Crianças (MPA)", min_value=0, key="mpa9")
-        
-        tot9 = t9 + v9 + s9 + di9 + me9 + lo9 + mi9 + mpa9
+        st.markdown("---")
+        st.subheader("Crianças (11h)")
+        ci1, ci2, ci3 = st.columns(3)
+        mi_c_11 = ci1.number_input("MI Crianças ", min_value=0, key="mic11")
+        mi_s_11 = ci2.number_input("MI Servos ", min_value=0, key="mis11")
+        mi_p_11 = ci3.number_input("MI Pais ", min_value=0, key="mip11")
 
-    # --- CULTO 11:00 (CONFORME CÓDIGOS ANTERIORES E IMAGENS) ---
-    with st.expander("⛪ CULTO DAS 11:00h", expanded=False):
-        r11 = st.text_input("Responsável (11h)", key="r11")
-        
-        st.markdown('<div class="pib-faixa pib-faixa-center">Compareceram</div>', unsafe_allow_html=True)
-        c4, c5, c6 = st.columns(3)
-        t11 = c4.number_input("Templo ", min_value=0, key="t11")
-        v11 = c5.number_input("Visitantes ", min_value=0, key="v11")
-        s11 = c6.number_input("6º Andar ", min_value=0, key="s11")
-        
-        st.markdown('<div class="pib-faixa">🤝 Servindo</div>', unsafe_allow_html=True)
-        di11 = st.number_input("Diaconia ", min_value=0, key="di11")
-        
-        tot11 = t11 + v11 + s11 + di11
+    # --- CÁLCULOS LÓGICOS ---
+    total_comp_9 = templo_9 + visitantes_9 + sexto_9
+    total_serv_9 = diaconia_9 + mesa_9 + louvor_9
+    total_mi_9 = mi_c_9 + mi_s_9 + mi_p_9
+    total_mpa_9 = mpa_c_9 + mpa_s_9 + mpa_p_9
+    total_culto_9 = total_comp_9 + total_serv_9 + total_mi_9 + total_mpa_9
 
-    # --- PROCESSAMENTO ---
-    d_str = d9.strftime('%d/%m/%Y') if d9 else ""
-    relatorio = f"Relatório PIB Floripa - {d_str}\n\n9h: {tot9} pessoas\n11h: {tot11} pessoas\nTOTAL GERAL: {tot9+tot11}"
+    total_comp_11 = templo_11 + visitantes_11 + sexto_11
+    total_serv_11 = diaconia_11 + mesa_11 + louvor_11
+    total_mi_11 = mi_c_11 + mi_s_11 + mi_p_11
+    total_culto_11 = total_comp_11 + total_serv_11 + total_mi_11
 
-    # --- LINHA DE AÇÕES PADRONIZADA ---
-    st.markdown("---")
-    col_arq, col_pla, col_wha = st.columns(3)
+    total_geral = total_culto_9 + total_culto_11
 
-    with col_arq:
-        show_text = st.button("📄 Arquivo em Texto")
+    # --- BOTÃO GERAR RELATÓRIO ---
+    st.markdown("### 📋 Resultado Final")
+    if st.button("GERAR TEXTO PARA WHATSAPP", use_container_width=True):
+        relatorio = f"""Relatório dos cultos
 
-    with col_pla:
-        df = pd.DataFrame([{"Data": d_str, "9h": tot9, "11h": tot11, "Total": tot9+tot11}])
-        buf = BytesIO()
-        with pd.ExcelWriter(buf, engine='xlsxwriter') as wr: df.to_excel(wr, index=False)
-        st.download_button("📊 Planilha", buf.getvalue(), f"pib_{d_str}.xlsx")
+Culto das 9:00hrs
+Responsável pela contagem: {resp_9}
+Data: {data_9.strftime('%d/%m/%Y')}
+Compareceram: {resp_9}
+Templo e mezanino: {templo_9}
+Visitantes: {visitantes_9}
+Sexto andar: {sexto_9}
+Total: {total_comp_9}
 
-    with col_wha:
-        link_wa = f"https://wa.me/?text={urllib.parse.quote(relatorio)}"
-        st.markdown(f'<a href="{link_wa}" target="_blank" class="btn-pib-link">📲 WhatsApp</a>', unsafe_allow_html=True)
+Servindo:
+Diaconia: {diaconia_9} | Mesa: {mesa_9} | Louvor: {louvor_9}
+Total: {total_serv_9}
 
-    if show_text:
-        st.code(relatorio)
+MI:
+Crianças: {mi_c_9} | Servos: {mi_s_9} | Pai/Mãe: {mi_p_9}
+Total: {total_mi_9}
 
+MPA:
+Crianças: {mpa_c_9} | Servos: {mpa_s_9} | Pai/Mãe: {mpa_p_9}
+Total: {total_mpa_9}
+
+TOTAL DO CULTO DAS 9:00hrs: {total_culto_9}
+
+--------------------------------------
+
+Culto das 11:00hrs
+Responsável pela contagem: {resp_11}
+Data: {data_9.strftime('%d/%m/%Y')}
+Compareceram: {resp_11}
+Templo e mezanino: {templo_11}
+Visitantes: {visitantes_11}
+Sexto andar: {sexto_11}
+Total: {total_comp_11}
+
+Servindo:
+Diaconia: {diaconia_11} | Mesa: {mesa_11} | Louvor: {louvor_11}
+Total: {total_serv_11}
+
+MI:
+Crianças: {mi_c_11} | Servos: {mi_s_11} | Pai/Mãe: {mi_p_11}
+Total: {total_mi_11}
+
+TOTAL DO CULTO DAS 11:00hrs: {total_culto_11}
+
+TOTAL GERAL: {total_geral}"""
+
+        st.code(relatorio, language="text")
+        st.success("Cópia o texto acima e cole no WhatsApp!")
+
+elif senha_digitada == "":
+    st.info("Por favor, digite a senha na barra lateral para acessar o sistema.")
 else:
-    st.info("Aguardando acesso.")
+    st.error("Senha incorreta. Acesso negado.")
