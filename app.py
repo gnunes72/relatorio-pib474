@@ -7,155 +7,182 @@ from PIL import Image
 import os
 
 # --- CONFIGURAÇÃO DA PÁGINA ---
-st.set_page_config(page_title="PIB Floripa - Gestão", page_icon="⛪", layout="centered")
+st.set_page_config(page_title="Relatório PIB Floripa", page_icon="⛪", layout="centered")
 
-# --- ESTILIZAÇÃO CSS (FOCO EM SIMETRIA E PADRONIZAÇÃO) ---
+# --- DESIGN E ESTILIZAÇÃO CSS (Padrão PIB Floripa) ---
+# Cores PIB: Verde Escuro #005a3c | Verde Claro Fundo #e8f5e9
 st.markdown("""
     <style>
+    /* Estilo do Fundo e Títulos Principais */
     .stApp { background-color: #ffffff; }
+    h1 { color: #005a3c; font-size: 34px !important; margin-bottom: 0px; text-align: center; }
+    h2 { color: #005a3c; font-size: 20px !important; font-weight: normal; margin-top: 0px; margin-bottom: 30px; text-align: center; }
     
-    /* Cabeçalho Profissional */
-    .pib-header-title { color: #004d40; font-size: 38px !important; font-weight: 800; text-align: center; margin-bottom: 0px; }
-    .pib-header-subtitle { color: #004d40; font-size: 17px !important; text-align: center; margin-top: -10px; margin-bottom: 25px; }
-    
-    /* Faixas de Subtítulos */
-    .pib-faixa {
-        background-color: #004d40;
-        color: #ffffff !important;
+    /* Estilo dos Subtítulos (Compareceram, Servindo, etc.) com Faixa Verde */
+    .pib-subtitulo {
+        background-color: #005a3c;
+        color: white !important;
         padding: 8px 15px;
-        border-radius: 6px;
-        font-size: 14px !important;
-        font-weight: 600;
-        margin-top: 15px;
-        margin-bottom: 12px;
+        border-radius: 5px;
+        font-size: 14px !important; /* Tamanho da fonte conforme solicitado */
+        font-weight: bold;
+        margin-top: 20px;
+        margin-bottom: 15px;
         display: flex;
         align-items: center;
         gap: 10px;
     }
-    .pib-faixa-center { justify-content: center; text-transform: uppercase; letter-spacing: 1px; }
 
-    /* Containers com fundo escurecido para contraste */
-    .stExpander { 
-        border: 1px solid #81c784; 
-        border-radius: 12px; 
-        background-color: #e3eedf !important; 
-        margin-bottom: 15px; 
-    }
+    /* Estilo dos Containers de Dados (Verde Claríssimo para preenchimento) */
+    .stExpander { border: 1px solid #a5d6a7; border-radius: 8px; background-color: #e8f5e9; margin-bottom: 20px; }
     
-    /* Campos de Entrada Brancos */
-    .stNumberInput div div input, .stTextInput div div input { 
-        background-color: #ffffff !important; 
-        border-radius: 8px !important;
-    }
+    /* Estilo de Inputs */
+    .stNumberInput label, .stTextInput label, .stDateInput label { color: #005a3c !important; font-weight: bold; font-size: 13px; }
     
-    /* Layout dos Botões em Linha com Ícones Externos */
-    .action-container {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-end;
-        margin-top: 30px;
-        text-align: center;
-    }
-    
-    .action-item {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        max-width: 30%; /* Garante que os 3 caibam na linha */
-    }
-
-    .icon-label {
-        font-size: 24px;
-        margin-bottom: 5px;
-    }
-
-    /* Botões Padronizados */
-    .stButton>button, .btn-wa-custom {
-        background-color: #004d40 !important;
-        color: white !important;
-        height: 45px !important;
-        width: 100% !important;
-        border-radius: 8px !important;
+    /* --- PADRONIZAÇÃO TOTAL DOS BOTÕES DE AÇÃO --- */
+    .stButton>button, .btn-pib-wa {
+        background-color: #005a3c !important; /* MESMA COR VERDE */
+        color: white !important; /* TEXTO BRANCO */
+        height: 48px !important; /* MESMA ALTURA */
+        width: 100% !important; /* OCUPA TODA A COLUNA */
+        border-radius: 5px !important;
         font-weight: bold !important;
+        font-size: 14px !important; /* MESMO TAMANHO DE FONTE QUE OS SUBTÍTULOS */
         border: none !important;
-        font-size: 14px !important;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 10px !important; /* ESPAÇO ÍCONE-TEXTO */
         text-decoration: none !important;
+        transition: 0.3s;
     }
-
-    label { color: #004d40 !important; font-weight: 700 !important; }
+    .stButton>button:hover, .btn-pib-wa:hover { background-color: #004d30 !important; }
+    
+    /* Ajuste de ícones */
+    .css-1offfwp, .stButton>button div, .btn-pib-wa div { font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif !important; }
     </style>
     """, unsafe_allow_html=True)
 
-# --- LOGIN ---
-if st.sidebar.text_input("🔐 Acesso:", type="password").upper() == "PIB474":
-    
-    # --- LOGO E TÍTULOS ---
-    col_l, col_t = st.columns([1, 4])
-    with col_l:
-        if os.path.exists("logo.png"): st.image("logo.png", width=100)
-    with col_t:
-        st.markdown('<p class="pib-header-title">PIB FLORIPA</p>', unsafe_allow_html=True)
-        st.markdown('<p class="pib-header-subtitle">Primeira Igreja Batista de Florianópolis</p>', unsafe_allow_html=True)
+# --- SENHA DE ACESSO (Maiúsculas/Minúsculas) ---
+SENHA_DEFINIDA = "PIB474" 
 
-    # --- FORMULÁRIO 09:00 (Fundo escurecido conforme solicitado) ---
-    with st.expander("⛪ CULTO DAS 09:00h", expanded=True):
-        r9 = st.text_input("Responsável (9h)", key="r9")
-        d9 = st.date_input("Data (9h)", value=None, format="DD/MM/YYYY", key="d9")
+st.sidebar.markdown(f'<div class="pib-subtitulo">🔐 Acesso Restrito</div>', unsafe_allow_html=True)
+senha_digitada = st.sidebar.text_input("Senha:", type="password")
+
+# Verifica senha aceitando qualquer combinação de maiúsculas/minúsculas
+if senha_digitada.upper() == SENHA_DEFINIDA:
+    
+    # --- CABEÇALHO (LOGO E NOMES) ---
+    col_logo, col_nome = st.columns([1, 4])
+    with col_logo:
+        # Tenta carregar o logo.png do repositório
+        if os.path.exists("logo.png"):
+            st.image("logo.png", width=90)
+        else:
+            st.warning("Suba o logo.png para o GitHub")
+            
+    with col_nome:
+        st.markdown("<h1>PIB Floripa</h1>", unsafe_allow_html=True)
+        st.markdown("<h2>Primeira Igreja Batista de Florianópolis - Relatório de Cultos</h2>", unsafe_allow_html=True)
+    
+    # --- CULTO 09:00 ---
+    with st.expander("🟢 DADOS DO CULTO DAS 09:00h", expanded=True):
+        resp_9 = st.text_input("Responsável pela contagem (9h)", value="", key="r9")
+        data_9 = st.date_input("Data (9h)", value=None, format="DD/MM/YYYY", key="d9")
         
-        st.markdown('<div class="pib-faixa pib-faixa-center">Compareceram</div>', unsafe_allow_html=True)
+        # Subtítulo Compareceram
+        st.markdown('<div class="pib-subtitulo">👥 Compareceram</div>', unsafe_allow_html=True)
         c1, c2, c3 = st.columns(3)
-        t9 = c1.number_input("Templo", min_value=0, key="t9n")
-        v9 = c2.number_input("Visitantes", min_value=0, key="v9n")
-        s9 = c3.number_input("6º Andar", min_value=0, key="s9n")
+        temp_9 = c1.number_input("Templo e mezanino", min_value=0, key="t9_")
+        vis_9 = c2.number_input("Visitantes", min_value=0, key="v9_")
+        sex_9 = c3.number_input("Sexto andar", min_value=0, key="s9_")
         
-        st.markdown('<div class="pib-faixa">🤝 Servindo</div>', unsafe_allow_html=True)
+        # Subtítulo Servindo
+        st.markdown('<div class="pib-subtitulo">🛠️ Servindo</div>', unsafe_allow_html=True)
         s1, s2, s3 = st.columns(3)
-        di9 = s1.number_input("Diaconia", min_value=0, key="di9")
-        me9 = s2.number_input("Mesa", min_value=0, key="me9")
-        lo9 = s3.number_input("Louvor", min_value=0, key="lo9")
+        dia_9 = s1.number_input("Diaconia", min_value=0, key="d9_")
+        mes_9 = s2.number_input("Mesa", min_value=0, key="m9_")
+        lou_9 = s3.number_input("Louvor", min_value=0, key="l9_")
 
-        st.markdown('<div class="pib-faixa">🎒 MI (Infantil)</div>', unsafe_allow_html=True)
-        mi9 = st.number_input("Crianças (MI)", min_value=0, key="mi9n")
+        # Subtítulo MI (Infantil)
+        st.markdown('<div class="pib-subtitulo">🎒 MI (Ministério Infantil)</div>', unsafe_allow_html=True)
+        mi1, mi2, mi3 = st.columns(3)
+        mi_c_9 = mi1.number_input("Crianças (MI)", min_value=0, key="mic9_")
+        mi_s_9 = mi2.number_input("Servos (MI)", min_value=0, key="mis9_")
+        mi_p_9 = mi3.number_input("Pai/Mãe (MI)", min_value=0, key="mip9_")
+
+        # Subtítulo MPA (Pré-Adolescente)
+        st.markdown('<div class="pib-subtitulo">🎮 MPA (Pré-Adolescente)</div>', unsafe_allow_html=True)
+        mp1, mp2, mp3 = st.columns(3)
+        mpa_c_9 = mp1.number_input("Crianças (MPA)", min_value=0, key="mpac9_")
+        mpa_s_9 = mp2.number_input("Servos (MPA)", min_value=0, key="mpas9_")
+        mpa_p_9 = mp3.number_input("Pai/Mãe (MPA)", min_value=0, key="mpap9_")
         
-        st.markdown('<div class="pib-faixa">🎮 MPA (Pré-Adolescente)</div>', unsafe_allow_html=True)
-        mpa9 = st.number_input("Crianças (MPA)", min_value=0, key="mpa9n")
+        # Subtítulo Ebed
+        st.markdown('<div class="pib-subtitulo">📚 Ebed</div>', unsafe_allow_html=True)
+        ebed_9 = st.number_input("Total Ebed", min_value=0, key="e9_", label_visibility="collapsed")
 
-    # --- PROCESSAMENTO ---
-    d_str = d9.strftime('%d/%m/%Y') if d9 else ""
-    tot9 = (t9+v9+s9+di9+me9+lo9+mi9+mpa9)
-    relatorio = f"Relatório PIB Floripa - {d_str}\n\nTotal Culto 9h: {tot9} pessoas."
+    # --- CULTO 11:00 ---
+    with st.expander("🟢 DADOS DO CULTO DAS 11:00h", expanded=False):
+        resp_11 = st.text_input("Responsável pela contagem (11h)", value="", key="r11")
+        data_11 = st.date_input("Data (11h)", value=None, format="DD/MM/YYYY", key="d11")
+        
+        st.markdown('<div class="pib-faixa">👥 Compareceram</div>', unsafe_allow_html=True)
+        c4, c5, c6 = st.columns(3)
+        t11 = c4.number_input("Templo ", min_value=0, key="t11_")
+        v11 = c5.number_input("Visitantes ", min_value=0, key="v11_")
+        s11 = c6.number_input("Sexto andar ", min_value=0, key="s11_")
+        
+        st.markdown('<div class="pib-faixa">🛠️ Servindo</div>', unsafe_allow_html=True)
+        di11 = st.number_input("Diaconia ", min_value=0, key="di11_")
 
-    # --- SEÇÃO DE AÇÕES (PADRONIZADA E EM ORDEM ALFABÉTICA) ---
-    st.markdown("---")
+    # --- CÁLCULOS ---
+    total_9h = (temp_9+vis_9+sex_9) + (dia_9+mes_9+lou_9) + (mi_c_9+mi_s_9+mi_p_9) + (mpa_c_9+mpa_s_9+mpa_p_9) + ebed_9
+    total_11h = (t11+v11+s11) + (di11)
     
-    # Criamos a estrutura de colunas para os botões
-    col_p, col_t, col_w = st.columns(3)
+    total_geral = total_9h + total_11h
 
-    # 1. PLANILHA (P)
-    with col_p:
-        st.markdown('<div style="text-align: center;"><span class="icon-label">📥</span></div>', unsafe_allow_html=True)
-        df = pd.DataFrame([{"Data": d_str, "Total": tot9}])
-        buf = BytesIO()
-        with pd.ExcelWriter(buf, engine='xlsxwriter') as wr: df.to_excel(wr, index=False)
-        st.download_button("PLANILHA", buf.getvalue(), f"pib_{d_str}.xlsx")
+    # --- GERAÇÃO DO TEXTO DO RELATÓRIO ---
+    dt9 = data_9.strftime('%d/%m/%Y') if data_9 else ""
+    rel_texto = f"""Relatório de Cultos - PIB Floripa - Data: {dt9}\nTotal Geral: {total_geral}\nCulto 9h: {total_9h}\nCulto 11h: {total_11h}"""
 
-    # 2. TEXTO (T) - Centralizado
+    # --- BOTÕES DE AÇÃO (ORDEM E PADRONIZAÇÃO EXATAS) ---
+    st.markdown("---")
+    col_t, col_p, col_w = st.columns(3) # Ordem Alfabética: Arquivo, Planilha, WhatsApp
+
+    # 1. ARQUIVO EM TEXTO (Ordem: A)
     with col_t:
-        st.markdown('<div style="text-align: center;"><span class="icon-label">📋</span></div>', unsafe_allow_html=True)
-        show_text = st.button("TEXTO")
+        st.write("") # Pequeno ajuste de alinhamento
+        # Ícone LATERAL e Texto PADRONIZADO
+        btn_texto_label = "📄 Arquivo em Texto"
+        show_text = st.button(btn_texto_label)
 
-    # 3. WHATSAPP (W)
+    # 2. PLANILHA (Ordem: P)
+    with col_p:
+        st.write("")
+        df = pd.DataFrame([{"Data": dt9, "9h": total_9h, "11h": total_11h, "Geral": total_geral}])
+        output = BytesIO()
+        with pd.ExcelWriter(output, engine='xlsxwriter') as writer: df.to_excel(writer, index=False)
+        # Botão PADRONIZADO (Verde, Tamanho, Fonte) com Ícone LATERAL
+        btn_planilha_label = "📊 Planilha"
+        st.download_button(btn_planilha_label, data=output.getvalue(), file_name=f"pib_floripa_{dt9}.xlsx")
+
+    # 3. WHATSAPP (Ordem: W)
     with col_w:
-        st.markdown('<div style="text-align: center;"><span class="icon-label">📲</span></div>', unsafe_allow_html=True)
-        link_wa = f"https://wa.me/?text={urllib.parse.quote(relatorio)}"
-        st.markdown(f'<a href="{link_wa}" target="_blank" class="btn-wa-custom">WHATSAPP</a>', unsafe_allow_html=True)
+        st.write("")
+        texto_wa = urllib.parse.quote(rel_texto)
+        link_wa = f"https://wa.me/?text={texto_wa}"
+        # Botão PADRONIZADO (Verde, Tamanho, Fonte) com Ícone LATERAL
+        # Usamos markdown para o link, mas replicamos a classe CSS do botão Streamlit
+        st.markdown(f'<a href="{link_wa}" target="_blank" class="btn-pib-wa"><div>📲 WhatsApp</div></a>', unsafe_allow_html=True)
 
-    if show_text:
-        st.code(relatorio)
+    # --- CÓPIA MANUAL ESCONDIDA ---
+    st.markdown("---")
+    with st.expander("📋 CÓPIA MANUAL (Clique para abrir e copiar)", expanded=False):
+        st.markdown("### Copie o relatório abaixo:")
+        st.code(rel_texto, language="text")
 
 else:
-    st.info("Insira a senha para acessar.")
+    # Tela de senha (simples)
+    st.markdown("<h1 style='text-align: center; color: #005a3c;'>PIB Floripa</h1>", unsafe_allow_html=True)
+    st.markdown("<h2 style='text-align: center; color: #005a3c;'>Aguardando senha PIB474...</h2>", unsafe_allow_html=True)
