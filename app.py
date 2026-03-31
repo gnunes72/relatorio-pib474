@@ -7,7 +7,7 @@ import urllib.parse
 # Configuração visual
 st.set_page_config(page_title="Relatório PIB474", page_icon="🌿", layout="centered")
 
-# Cores em tons de verde
+# Cores em tons de verde - CORREÇÃO: unsafe_allow_html
 st.markdown("""
     <style>
     .stApp { background-color: #ffffff; }
@@ -16,7 +16,7 @@ st.markdown("""
     h1, h2, h3 { color: #1b5e20; }
     label { color: #2e7d32 !important; font-weight: bold; }
     </style>
-    """, unsafe_allow_stdio=True)
+    """, unsafe_allow_html=True)
 
 SENHA_CORRETA = "PIB474" 
 
@@ -134,7 +134,7 @@ MPA:
 Crianças: {mpa_c_9}
 Servos: {mpa_s_9}
 Pai/Mãe: {mpa_p_9}
-Total: {total_mpa_9}
+Total: {t_mpa_9}
 
 Ebed: {ebed_9}
 
@@ -168,7 +168,7 @@ Classe batismo:
 Jovens: {bat_j}
 Adultos: {bat_a}
 Servos: {bat_s}
-Total: {total_bat_11}
+Total: {t_bat_11}
 
 TOTAL DO CULTO DAS 11:00hrs: {total_11h}
 
@@ -179,10 +179,15 @@ TOTAL GERAL: {total_geral}"""
     
     with col_wa:
         txt_wa = urllib.parse.quote(rel_texto)
-        st.markdown(f'<a href="https://wa.me/?text={txt_wa}" target="_blank"><button style="width:100%; height:45px; background-color:#25D366; color:white; border:none; border-radius:10px; cursor:pointer; font-weight:bold;">📲 Enviar via WhatsApp</button></a>', unsafe_allow_stdio=True)
+        st.markdown(f'<a href="https://wa.me/?text={txt_wa}" target="_blank"><button style="width:100%; height:45px; background-color:#25D366; color:white; border:none; border-radius:10px; cursor:pointer; font-weight:bold;">📲 Enviar via WhatsApp</button></a>', unsafe_allow_html=True)
     
     with col_pla:
-        df = pd.DataFrame([{"Data": dt9, "9h": total_9h, "11h": total_11h, "Geral": total_geral}])
+        # Criando uma planilha mais detalhada para o Google Sheets
+        dados_planilha = {
+            "Item": ["Total 9h", "Total 11h", "GERAL", "Templo 9h", "Templo 11h", "Ebed", "MI Total 9h", "MI Total 11h"],
+            "Valores": [total_9h, total_11h, total_geral, temp_9, temp_11, ebed_9, t_mi_9, t_mi_11]
+        }
+        df = pd.DataFrame(dados_planilha)
         output = BytesIO()
         with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
             df.to_excel(writer, index=False)
