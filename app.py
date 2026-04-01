@@ -52,6 +52,20 @@ st.markdown("""
         font-size: 20px !important;
     }
 
+    /* Estilo para simular o campo de data desativado mas funcional */
+    .fake-date-input {
+        height: 55px;
+        background-color: #f0f2f6;
+        border: 1px solid rgba(49, 51, 63, 0.2);
+        border-radius: 0.5rem;
+        display: flex;
+        align-items: center;
+        padding: 0 1rem;
+        color: #31333f;
+        font-size: 20px;
+        margin-bottom: 1rem;
+    }
+
     .stButton>button, .btn-pib-custom {
         background-color: #004d40 !important;
         color: white !important;
@@ -75,10 +89,6 @@ st.markdown("""
 if 'autenticado' not in st.session_state: st.session_state.autenticado = False
 if 'mostrar_relatorio' not in st.session_state: st.session_state.mostrar_relatorio = False
 if 'wa_confirmar' not in st.session_state: st.session_state.wa_confirmar = False
-
-# Inicializa a data no estado da sessão se não existir
-if 'data_compartilhada' not in st.session_state:
-    st.session_state['data_compartilhada'] = None
 
 with st.sidebar:
     if not st.session_state.autenticado:
@@ -105,8 +115,8 @@ if st.session_state.autenticado:
     with st.expander("🟢 CULTO DAS 09:00h - Preencher Dados", expanded=False):
         r9 = st.text_input("Responsável pela contagem (9h)", placeholder="Nome...", key="res9")
         
-        # Campo de data mestre
-        d9_input = st.date_input("Data", value=st.session_state['data_compartilhada'], format="DD/MM/YYYY", key="data_compartilhada")
+        # Campo de data mestre (Inicia vazio/None para não forçar "hoje")
+        d9_input = st.date_input("Data", value=None, format="DD/MM/YYYY", key="data_contagem_main")
         
         st.markdown('<div class="pib-faixa faixa-center">Compareceram</div>', unsafe_allow_html=True)
         c1, c2, c3 = st.columns(3)
@@ -131,8 +141,10 @@ if st.session_state.autenticado:
     with st.expander("🟢 CULTO DAS 11:00h - Preencher Dados", expanded=False):
         r11 = st.text_input("Responsável pela contagem (11h)", placeholder="Nome...", key="res11")
         
-        # Campo espelho que reflete o estado da data_compartilhada
-        st.date_input("Data ", value=st.session_state['data_compartilhada'], format="DD/MM/YYYY", key="data_view_11h", disabled=True)
+        # Sincronização Visual Infalível:
+        d_formatada = d9_input.strftime('%d/%m/%Y') if d9_input else "DD/MM/YYYY"
+        st.markdown('<label>Data</label>', unsafe_allow_html=True)
+        st.markdown(f'<div class="fake-date-input">{d_formatada}</div>', unsafe_allow_html=True)
         
         st.markdown('<div class="pib-faixa faixa-center">Compareceram</div>', unsafe_allow_html=True)
         c4, c5, c6 = st.columns(3)
@@ -151,7 +163,7 @@ if st.session_state.autenticado:
         bj, ba, bs = ba1.number_input("Jovens", 0, key="bj"), ba2.number_input("Adultos", 0, key="ba"), ba3.number_input("Servos ", 0, key="bs")
 
     # --- CÁLCULOS E RELATÓRIO ---
-    d_s = st.session_state['data_compartilhada'].strftime('%d/%m/%Y') if st.session_state['data_compartilhada'] else "dd/mm/aaaa"
+    d_relatorio = d9_input.strftime('%d/%m/%Y') if d9_input else "dd/mm/aaaa"
     
     t_c9, t_s9, t_mi9, t_mpa9 = (t9+v9+s9), (di9+me9+lo9), (mic9+mis9+mip9), (mpac9+mpas9+mpap9)
     total_9h = t_c9 + t_s9 + t_mi9 + t_mpa9 + eb9
@@ -162,7 +174,7 @@ if st.session_state.autenticado:
 
 Culto das 9:00hrs
 Responsável pela contagem: {r9}
-Data: {d_s}
+Data: {d_relatorio}
 
 Compareceram
 Templo e mezanino: {t9}
@@ -193,7 +205,7 @@ TOTAL DO CULTO DAS 9:00hrs: {total_9h}
 
 Culto das 11:00hrs
 Responsável pela contagem: {r11}
-Data: {d_s}
+Data: {d_relatorio}
 
 Compareceram
 Templo e mezanino: {t11}
