@@ -130,7 +130,7 @@ if st.session_state.autenticado:
     t_c11, t_s11, t_mi11, t_bat = (t11+v11+s11), (di11+me11+lo11), (mic11+mis11+mip11), (bj+ba+bs)
     total_11h = t_c11 + t_s11 + t_mi11 + t_bat
 
-    # --- RELATÓRIO FORMATADO (ESTRUTURA RÍGIDA) ---
+    # --- RELATÓRIO FINAL ---
     rel_final = f"""Relatório dos cultos
 
 Culto das 9:00hrs
@@ -196,20 +196,20 @@ TOTAL DO CULTO DAS 11:00hrs: {total_11h}
 
 TOTAL GERAL: {total_9h + total_11h}"""
 
+    # Formatação especial para WhatsApp (Melhor Opção)
+    wa_msg = f"```\n{rel_final}\n```"
+
     st.markdown("---")
     c_v, c_w = st.columns(2)
     with c_v:
         if st.button("📄 Visualizar Relatório"): st.session_state.mostrar_relatorio = not st.session_state.mostrar_relatorio
     with c_w:
-        if st.button("📲 WhatsApp"): st.session_state.wa_confirmar = not st.session_state.wa_confirmar
+        if st.button("📲 Enviar WhatsApp"): st.session_state.wa_confirmar = not st.session_state.wa_confirmar
 
     if st.session_state.wa_confirmar:
-        st.markdown('<div class="wa-confirm"><strong>Selecione o formato de envio:</strong></div>', unsafe_allow_html=True)
-        cw1, cw2 = st.columns(2)
-        with cw1:
-            st.markdown(f'<a href="https://wa.me/?text={urllib.parse.quote(rel_final)}" target="_blank" class="btn-pib-custom">Texto</a>', unsafe_allow_html=True)
-        with cw2:
-            st.markdown(f'<a href="https://wa.me/?text={urllib.parse.quote(rel_final)}" target="_blank" class="btn-pib-custom">Planilha</a>', unsafe_allow_html=True)
+        st.markdown('<div class="wa-confirm"><strong>Confirmar envio do relatório para o WhatsApp?</strong></div>', unsafe_allow_html=True)
+        if st.markdown(f'<a href="https://wa.me/?text={urllib.parse.quote(wa_msg)}" target="_blank" class="btn-pib-custom">Sim, Enviar Relatório</a>', unsafe_allow_html=True):
+             st.session_state.wa_confirmar = False
 
     if st.session_state.mostrar_relatorio:
         st.code(rel_final, language="text")
