@@ -9,22 +9,27 @@ import os
 # --- CONFIGURAÇÃO DA PÁGINA ---
 st.set_page_config(page_title="Relatório PIB Floripa", page_icon="⛪", layout="centered")
 
-# --- DESIGN E ESTILIZAÇÃO CSS ---
+# --- DESIGN E ESTILIZAÇÃO CSS (Ajuste de Fontes) ---
 st.markdown("""
     <style>
+    /* Aumento Global de Fonte */
+    html, body, [class*="st-"] {
+        font-size: 18px !important;
+    }
+    
     .stApp { background-color: #ffffff; }
-    .pib-header-title { color: #004d40; font-size: 42px !important; font-weight: 800; margin-bottom: 0px; text-align: center; }
-    .pib-header-subtitle { color: #004d40; font-size: 19px !important; margin-top: -10px; margin-bottom: 5px; text-align: center; }
+    .pib-header-title { color: #004d40; font-size: 45px !important; font-weight: 800; margin-bottom: 0px; text-align: center; }
+    .pib-header-subtitle { color: #004d40; font-size: 22px !important; margin-top: -10px; margin-bottom: 5px; text-align: center; }
     
     .pib-faixa {
         background-color: #004d40;
         color: #ffffff !important;
-        padding: 6px 15px;
+        padding: 8px 15px;
         border-radius: 4px;
-        font-size: 15px !important;
+        font-size: 18px !important;
         font-weight: 600;
-        margin-top: 20px;
-        margin-bottom: 12px;
+        margin-top: 22px;
+        margin-bottom: 14px;
         display: flex;
         align-items: center;
         gap: 10px;
@@ -32,16 +37,22 @@ st.markdown("""
     .faixa-center { justify-content: center; }
 
     .stExpander { border: 1px solid #a5d6a7; border-radius: 10px; background-color: #f1f8e9; margin-bottom: 15px; }
-    label { color: #004d40 !important; font-weight: 700 !important; }
+    
+    /* Labels dos campos mais nítidos */
+    label { 
+        color: #004d40 !important; 
+        font-weight: 700 !important; 
+        font-size: 18px !important; 
+    }
 
     .stButton>button, .btn-pib-custom {
         background-color: #004d40 !important;
         color: white !important;
-        height: 50px !important;
+        height: 55px !important;
         width: 100% !important;
         border-radius: 8px !important;
         font-weight: bold !important;
-        font-size: 14px !important;
+        font-size: 18px !important;
         border: none !important;
         display: flex !important;
         align-items: center !important;
@@ -49,7 +60,10 @@ st.markdown("""
         gap: 10px !important;
         text-decoration: none !important;
     }
-    .wa-confirm { background-color: #e8f5e9; padding: 15px; border-radius: 10px; border: 1px solid #2e7d32; margin-top: 10px; text-align: center; }
+    .wa-confirm { background-color: #e8f5e9; padding: 18px; border-radius: 10px; border: 1px solid #2e7d32; margin-top: 10px; text-align: center; font-size: 18px; }
+    
+    /* Ajuste específico para o título do Expander */
+    .st-emotion-cache-p5m613 { font-size: 20px !important; font-weight: bold !important; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -196,9 +210,6 @@ TOTAL DO CULTO DAS 11:00hrs: {total_11h}
 
 TOTAL GERAL: {total_9h + total_11h}"""
 
-    # Formatação especial para WhatsApp (Melhor Opção)
-    wa_msg = f"```\n{rel_final}\n```"
-
     st.markdown("---")
     c_v, c_w = st.columns(2)
     with c_v:
@@ -208,8 +219,8 @@ TOTAL GERAL: {total_9h + total_11h}"""
 
     if st.session_state.wa_confirmar:
         st.markdown('<div class="wa-confirm"><strong>Confirmar envio do relatório para o WhatsApp?</strong></div>', unsafe_allow_html=True)
-        if st.markdown(f'<a href="https://wa.me/?text={urllib.parse.quote(wa_msg)}" target="_blank" class="btn-pib-custom">Sim, Enviar Relatório</a>', unsafe_allow_html=True):
-             st.session_state.wa_confirmar = False
+        wa_msg = f"```\n{rel_final}\n```"
+        st.markdown(f'<a href="https://wa.me/?text={urllib.parse.quote(wa_msg)}" target="_blank" class="btn-pib-custom">Sim, Enviar Relatório</a>', unsafe_allow_html=True)
 
     if st.session_state.mostrar_relatorio:
         st.code(rel_final, language="text")
