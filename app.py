@@ -9,7 +9,6 @@ st.set_page_config(page_title="Relatório PIB Floripa", page_icon="⛪", layout=
 # --- DESIGN E ESTILIZAÇÃO CSS ---
 st.markdown("""
     <style>
-    /* Estilos Globais e Mobile */
     html, body, [class*="st-"] {
         font-size: 20px !important;
     }
@@ -48,7 +47,6 @@ st.markdown("""
         font-size: 20px !important; 
     }
 
-    /* Inputs maiores e mais visíveis */
     .stTextInput>div>div>input, .stNumberInput>div>div>input, .stDateInput>div>div>input {
         height: 55px !important;
         font-size: 20px !important;
@@ -70,7 +68,6 @@ st.markdown("""
     }
     
     .wa-confirm { background-color: #e8f5e9; padding: 20px; border-radius: 12px; border: 2px solid #2e7d32; text-align: center; font-size: 20px; }
-    
     .st-emotion-cache-p5m613 { font-size: 22px !important; font-weight: bold !important; color: #004d40 !important; }
     </style>
     """, unsafe_allow_html=True)
@@ -103,7 +100,9 @@ if st.session_state.autenticado:
     # --- CULTO 09:00 ---
     with st.expander("🟢 CULTO DAS 09:00h - Preencher Dados", expanded=False):
         r9 = st.text_input("Responsável pela contagem (9h)", placeholder="Nome...", key="res9")
-        d9_input = st.date_input("Data", value=None, format="DD/MM/YYYY", key="dat9")
+        
+        # A data principal
+        d9_input = st.date_input("Data", value=date.today(), format="DD/MM/YYYY", key="data_contagem")
         
         st.markdown('<div class="pib-faixa faixa-center">Compareceram</div>', unsafe_allow_html=True)
         c1, c2, c3 = st.columns(3)
@@ -128,8 +127,8 @@ if st.session_state.autenticado:
     with st.expander("🟢 CULTO DAS 11:00h - Preencher Dados", expanded=False):
         r11 = st.text_input("Responsável pela contagem (11h)", placeholder="Nome...", key="res11")
         
-        # Campo de data padronizado visualmente, mas espelhado
-        st.date_input("Data", value=d9_input, format="DD/MM/YYYY", key="dat11", disabled=True)
+        # AQUI A CORREÇÃO: Ele lê diretamente o valor do estado do primeiro campo
+        st.date_input("Data ", value=st.session_state.data_contagem, format="DD/MM/YYYY", key="dat11_visual", disabled=True)
         
         st.markdown('<div class="pib-faixa faixa-center">Compareceram</div>', unsafe_allow_html=True)
         c4, c5, c6 = st.columns(3)
@@ -148,7 +147,7 @@ if st.session_state.autenticado:
         bj, ba, bs = ba1.number_input("Jovens", 0, key="bj"), ba2.number_input("Adultos", 0, key="ba"), ba3.number_input("Servos ", 0, key="bs")
 
     # --- CÁLCULOS E RELATÓRIO ---
-    d_s = d9_input.strftime('%d/%m/%Y') if d9_input else "dd/mm/aaaa"
+    d_s = st.session_state.data_contagem.strftime('%d/%m/%Y')
     t_c9, t_s9, t_mi9, t_mpa9 = (t9+v9+s9), (di9+me9+lo9), (mic9+mis9+mip9), (mpac9+mpas9+mpap9)
     total_9h = t_c9 + t_s9 + t_mi9 + t_mpa9 + eb9
     t_c11, t_s11, t_mi11, t_bat = (t11+v11+s11), (di11+me11+lo11), (mic11+mis11+mip11), (bj+ba+bs)
@@ -182,7 +181,7 @@ MPA:
 Crianças: {mpac9}
 Servos: {mpas9}
 Pai/Mãe: {mpap9}
-Total: {t_mpa9}
+Total: {t_mi9}
 
 Ebed: {eb9}
 TOTAL DO CULTO DAS 9:00hrs: {total_9h}
@@ -224,4 +223,12 @@ TOTAL GERAL: {total_9h + total_11h}"""
     with c_v:
         if st.button("📄 Visualizar Relatório"): st.session_state.mostrar_relatorio = not st.session_state.mostrar_relatorio
     with c_w:
-        if st.button("📲 Enviar WhatsApp"): st.session_state.wa_
+        if st.button("📲 Enviar WhatsApp"): st.session_state.wa_confirmar = not st.session_state.wa_confirmar
+
+    if st.session_state.wa_confirmar:
+        st.markdown('<div class="wa-confirm"><strong>Confirmar envio do relatório para o WhatsApp?</strong></div>', unsafe_allow_html=True)
+        wa_msg = f"```\n{rel_final}\n```"
+        st.markdown(f'<a href="https://wa.me/?text={urllib.parse.quote(wa_msg)}" target="_blank" class="btn-pib-custom">Sim, Enviar Relatório</a>', unsafe_allow_html=True)
+
+    if st.session_state.mostrar_relatorio:
+        st.code(rel_final, language="text")
