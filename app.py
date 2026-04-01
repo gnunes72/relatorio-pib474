@@ -6,20 +6,19 @@ import os
 # --- CONFIGURAÇÃO DA PÁGINA ---
 st.set_page_config(page_title="Relatório PIB Floripa", page_icon="⛪", layout="centered")
 
-# --- DESIGN E ESTILIZAÇÃO CSS (Foco em Mobile e Fontes Grandes) ---
+# --- DESIGN E ESTILIZAÇÃO CSS ---
 st.markdown("""
     <style>
-    /* Estilos Globais e Mobile First */
+    /* Estilos Globais e Mobile */
     html, body, [class*="st-"] {
         font-size: 20px !important;
     }
     
-    /* Forçar fonte maior em telas pequenas (Celulares) */
     @media (max-width: 640px) {
-        .stMarkdown, .stTextInput, .stNumberInput, label, p {
+        .stMarkdown, .stTextInput, .stNumberInput, label, p, .stDateInput {
             font-size: 22px !important;
         }
-        .st-emotion-cache-p5m613 { font-size: 24px !important; } /* Título Expander */
+        .st-emotion-cache-p5m613 { font-size: 24px !important; }
     }
 
     .stApp { background-color: #ffffff; }
@@ -49,9 +48,9 @@ st.markdown("""
         font-size: 20px !important; 
     }
 
-    /* Aumentar altura dos campos de input para mobile */
-    .stTextInput>div>div>input, .stNumberInput>div>div>input {
-        height: 50px !important;
+    /* Inputs maiores e mais visíveis */
+    .stTextInput>div>div>input, .stNumberInput>div>div>input, .stDateInput>div>div>input {
+        height: 55px !important;
         font-size: 20px !important;
     }
 
@@ -69,21 +68,10 @@ st.markdown("""
         text-decoration: none !important;
         margin-top: 10px;
     }
+    
     .wa-confirm { background-color: #e8f5e9; padding: 20px; border-radius: 12px; border: 2px solid #2e7d32; text-align: center; font-size: 20px; }
     
-    /* Ajuste do título do Expander */
     .st-emotion-cache-p5m613 { font-size: 22px !important; font-weight: bold !important; color: #004d40 !important; }
-    
-    /* Info box para data espelhada */
-    .data-espelhada {
-        background-color: #e8f5e9;
-        padding: 10px;
-        border-radius: 8px;
-        border-left: 5px solid #2e7d32;
-        font-weight: bold;
-        color: #004d40;
-        margin-bottom: 15px;
-    }
     </style>
     """, unsafe_allow_html=True)
 
@@ -140,9 +128,8 @@ if st.session_state.autenticado:
     with st.expander("🟢 CULTO DAS 11:00h - Preencher Dados", expanded=False):
         r11 = st.text_input("Responsável pela contagem (11h)", placeholder="Nome...", key="res11")
         
-        # Ajuste Data: Exibição dinâmica
-        d_formatada = d9_input.strftime('%d/%m/%Y') if d9_input else "Aguardando data das 09h..."
-        st.markdown(f'<div class="data-espelhada">📅 Data: {d_formatada}</div>', unsafe_allow_html=True)
+        # Campo de data padronizado visualmente, mas espelhado
+        st.date_input("Data", value=d9_input, format="DD/MM/YYYY", key="dat11", disabled=True)
         
         st.markdown('<div class="pib-faixa faixa-center">Compareceram</div>', unsafe_allow_html=True)
         c4, c5, c6 = st.columns(3)
@@ -237,12 +224,4 @@ TOTAL GERAL: {total_9h + total_11h}"""
     with c_v:
         if st.button("📄 Visualizar Relatório"): st.session_state.mostrar_relatorio = not st.session_state.mostrar_relatorio
     with c_w:
-        if st.button("📲 Enviar WhatsApp"): st.session_state.wa_confirmar = not st.session_state.wa_confirmar
-
-    if st.session_state.wa_confirmar:
-        st.markdown('<div class="wa-confirm"><strong>Confirmar envio do relatório para o WhatsApp?</strong></div>', unsafe_allow_html=True)
-        wa_msg = f"```\n{rel_final}\n```"
-        st.markdown(f'<a href="https://wa.me/?text={urllib.parse.quote(wa_msg)}" target="_blank" class="btn-pib-custom">Sim, Enviar Relatório</a>', unsafe_allow_html=True)
-
-    if st.session_state.mostrar_relatorio:
-        st.code(rel_final, language="text")
+        if st.button("📲 Enviar WhatsApp"): st.session_state.wa_
