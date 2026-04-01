@@ -1,66 +1,89 @@
 import streamlit as st
 from datetime import date
-import pandas as pd
-from io import BytesIO
 import urllib.parse
-from PIL import Image
 import os
 
 # --- CONFIGURAÇÃO DA PÁGINA ---
 st.set_page_config(page_title="Relatório PIB Floripa", page_icon="⛪", layout="centered")
 
-# --- DESIGN E ESTILIZAÇÃO CSS ---
+# --- DESIGN E ESTILIZAÇÃO CSS (Foco em Mobile e Fontes Grandes) ---
 st.markdown("""
     <style>
+    /* Estilos Globais e Mobile First */
     html, body, [class*="st-"] {
-        font-size: 18px !important;
+        font-size: 20px !important;
     }
     
+    /* Forçar fonte maior em telas pequenas (Celulares) */
+    @media (max-width: 640px) {
+        .stMarkdown, .stTextInput, .stNumberInput, label, p {
+            font-size: 22px !important;
+        }
+        .st-emotion-cache-p5m613 { font-size: 24px !important; } /* Título Expander */
+    }
+
     .stApp { background-color: #ffffff; }
-    .pib-header-title { color: #004d40; font-size: 45px !important; font-weight: 800; margin-bottom: 0px; text-align: center; }
-    .pib-header-subtitle { color: #004d40; font-size: 22px !important; margin-top: -10px; margin-bottom: 5px; text-align: center; }
+    .pib-header-title { color: #004d40; font-size: 45px !important; font-weight: 800; text-align: center; margin-bottom: 0px; }
+    .pib-header-subtitle { color: #004d40; font-size: 22px !important; text-align: center; margin-top: -10px; }
     
     .pib-faixa {
         background-color: #004d40;
         color: #ffffff !important;
-        padding: 8px 15px;
-        border-radius: 4px;
-        font-size: 18px !important;
+        padding: 10px 15px;
+        border-radius: 6px;
+        font-size: 20px !important;
         font-weight: 600;
-        margin-top: 22px;
-        margin-bottom: 14px;
+        margin-top: 25px;
+        margin-bottom: 15px;
         display: flex;
         align-items: center;
         gap: 10px;
     }
     .faixa-center { justify-content: center; }
 
-    .stExpander { border: 1px solid #a5d6a7; border-radius: 10px; background-color: #f1f8e9; margin-bottom: 15px; }
+    .stExpander { border: 2px solid #a5d6a7; border-radius: 12px; background-color: #f1f8e9; margin-bottom: 20px; }
     
     label { 
         color: #004d40 !important; 
         font-weight: 700 !important; 
-        font-size: 18px !important; 
+        font-size: 20px !important; 
+    }
+
+    /* Aumentar altura dos campos de input para mobile */
+    .stTextInput>div>div>input, .stNumberInput>div>div>input {
+        height: 50px !important;
+        font-size: 20px !important;
     }
 
     .stButton>button, .btn-pib-custom {
         background-color: #004d40 !important;
         color: white !important;
-        height: 55px !important;
+        height: 65px !important;
         width: 100% !important;
-        border-radius: 8px !important;
+        border-radius: 10px !important;
         font-weight: bold !important;
-        font-size: 18px !important;
-        border: none !important;
+        font-size: 20px !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        gap: 10px !important;
         text-decoration: none !important;
+        margin-top: 10px;
     }
-    .wa-confirm { background-color: #e8f5e9; padding: 18px; border-radius: 10px; border: 1px solid #2e7d32; margin-top: 10px; text-align: center; font-size: 18px; }
+    .wa-confirm { background-color: #e8f5e9; padding: 20px; border-radius: 12px; border: 2px solid #2e7d32; text-align: center; font-size: 20px; }
     
-    .st-emotion-cache-p5m613 { font-size: 20px !important; font-weight: bold !important; }
+    /* Ajuste do título do Expander */
+    .st-emotion-cache-p5m613 { font-size: 22px !important; font-weight: bold !important; color: #004d40 !important; }
+    
+    /* Info box para data espelhada */
+    .data-espelhada {
+        background-color: #e8f5e9;
+        padding: 10px;
+        border-radius: 8px;
+        border-left: 5px solid #2e7d32;
+        font-weight: bold;
+        color: #004d40;
+        margin-bottom: 15px;
+    }
     </style>
     """, unsafe_allow_html=True)
 
@@ -77,7 +100,7 @@ with st.sidebar:
                 st.rerun()
             else: st.error("Senha incorreta")
     else:
-        if st.button("🚪 Sair do Sistema"):
+        if st.button("🚪 Sair"):
             st.session_state.autenticado = False
             st.rerun()
 
@@ -89,7 +112,7 @@ if st.session_state.autenticado:
         st.markdown('<p class="pib-header-title">PIB FLORIPA</p>', unsafe_allow_html=True)
         st.markdown('<p class="pib-header-subtitle">Primeira Igreja Batista de Florianópolis</p>', unsafe_allow_html=True)
     
-    # --- CULTO 09:00 (Ajuste: expanded=False) ---
+    # --- CULTO 09:00 ---
     with st.expander("🟢 CULTO DAS 09:00h - Preencher Dados", expanded=False):
         r9 = st.text_input("Responsável pela contagem (9h)", placeholder="Nome...", key="res9")
         d9_input = st.date_input("Data", value=None, format="DD/MM/YYYY", key="dat9")
@@ -116,7 +139,10 @@ if st.session_state.autenticado:
     # --- CULTO 11:00 ---
     with st.expander("🟢 CULTO DAS 11:00h - Preencher Dados", expanded=False):
         r11 = st.text_input("Responsável pela contagem (11h)", placeholder="Nome...", key="res11")
-        d11_input = st.date_input("Data", value=d9_input, format="DD/MM/YYYY", key="dat11", disabled=True)
+        
+        # Ajuste Data: Exibição dinâmica
+        d_formatada = d9_input.strftime('%d/%m/%Y') if d9_input else "Aguardando data das 09h..."
+        st.markdown(f'<div class="data-espelhada">📅 Data: {d_formatada}</div>', unsafe_allow_html=True)
         
         st.markdown('<div class="pib-faixa faixa-center">Compareceram</div>', unsafe_allow_html=True)
         c4, c5, c6 = st.columns(3)
