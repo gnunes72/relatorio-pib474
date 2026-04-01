@@ -9,10 +9,9 @@ import os
 # --- CONFIGURAÇÃO DA PÁGINA ---
 st.set_page_config(page_title="Relatório PIB Floripa", page_icon="⛪", layout="centered")
 
-# --- DESIGN E ESTILIZAÇÃO CSS (Ajuste de Fontes) ---
+# --- DESIGN E ESTILIZAÇÃO CSS ---
 st.markdown("""
     <style>
-    /* Aumento Global de Fonte */
     html, body, [class*="st-"] {
         font-size: 18px !important;
     }
@@ -38,7 +37,6 @@ st.markdown("""
 
     .stExpander { border: 1px solid #a5d6a7; border-radius: 10px; background-color: #f1f8e9; margin-bottom: 15px; }
     
-    /* Labels dos campos mais nítidos */
     label { 
         color: #004d40 !important; 
         font-weight: 700 !important; 
@@ -62,7 +60,6 @@ st.markdown("""
     }
     .wa-confirm { background-color: #e8f5e9; padding: 18px; border-radius: 10px; border: 1px solid #2e7d32; margin-top: 10px; text-align: center; font-size: 18px; }
     
-    /* Ajuste específico para o título do Expander */
     .st-emotion-cache-p5m613 { font-size: 20px !important; font-weight: bold !important; }
     </style>
     """, unsafe_allow_html=True)
@@ -92,8 +89,8 @@ if st.session_state.autenticado:
         st.markdown('<p class="pib-header-title">PIB FLORIPA</p>', unsafe_allow_html=True)
         st.markdown('<p class="pib-header-subtitle">Primeira Igreja Batista de Florianópolis</p>', unsafe_allow_html=True)
     
-    # --- CULTO 09:00 ---
-    with st.expander("🟢 CULTO DAS 09:00h - Preencher Dados", expanded=True):
+    # --- CULTO 09:00 (Ajuste: expanded=False) ---
+    with st.expander("🟢 CULTO DAS 09:00h - Preencher Dados", expanded=False):
         r9 = st.text_input("Responsável pela contagem (9h)", placeholder="Nome...", key="res9")
         d9_input = st.date_input("Data", value=None, format="DD/MM/YYYY", key="dat9")
         
@@ -137,14 +134,13 @@ if st.session_state.autenticado:
         ba1, ba2, ba3 = st.columns(3)
         bj, ba, bs = ba1.number_input("Jovens", 0, key="bj"), ba2.number_input("Adultos", 0, key="ba"), ba3.number_input("Servos ", 0, key="bs")
 
-    # --- CÁLCULOS ---
+    # --- CÁLCULOS E RELATÓRIO ---
     d_s = d9_input.strftime('%d/%m/%Y') if d9_input else "dd/mm/aaaa"
     t_c9, t_s9, t_mi9, t_mpa9 = (t9+v9+s9), (di9+me9+lo9), (mic9+mis9+mip9), (mpac9+mpas9+mpap9)
     total_9h = t_c9 + t_s9 + t_mi9 + t_mpa9 + eb9
     t_c11, t_s11, t_mi11, t_bat = (t11+v11+s11), (di11+me11+lo11), (mic11+mis11+mip11), (bj+ba+bs)
     total_11h = t_c11 + t_s11 + t_mi11 + t_bat
 
-    # --- RELATÓRIO FINAL ---
     rel_final = f"""Relatório dos cultos
 
 Culto das 9:00hrs
