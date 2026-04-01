@@ -93,7 +93,7 @@ if st.session_state.autenticado:
     # --- CULTO 09:00 ---
     with st.expander("🟢 CULTO DAS 09:00h - Preencher Dados", expanded=True):
         r9 = st.text_input("Responsável (9h)", placeholder="Nome...", key="res9")
-        d9_input = st.date_input("Data (9h)", value=None, format="DD/MM/YYYY", key="dat9")
+        d9_input = st.date_input("Data", value=None, format="DD/MM/YYYY", key="dat9")
         
         st.markdown('<div class="pib-faixa">👥 Compareceram</div>', unsafe_allow_html=True)
         c1, c2, c3 = st.columns(3)
