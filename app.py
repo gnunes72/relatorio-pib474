@@ -75,30 +75,30 @@ else:
         
         st.markdown('<div class="pib-faixa faixa-center">Compareceram</div>', unsafe_allow_html=True)
         c1, c2, c3 = st.columns(3)
-        t9 = c1.number_input("Templo/Mezanino", value=None, key="t9")
-        v9 = c2.number_input("Visitantes", value=None, key="v9")
-        s9 = c3.number_input("Sexto andar", value=None, key="s9")
+        t9 = c1.number_input("Templo/Mezanino", value=None, step=1, key="t9")
+        v9 = c2.number_input("Visitantes", value=None, step=1, key="v9")
+        s9 = c3.number_input("Sexto andar", value=None, step=1, key="s9")
         
         st.markdown('<div class="pib-faixa">🛠️ Servindo</div>', unsafe_allow_html=True)
         s1, s2, s3 = st.columns(3)
-        di9 = s1.number_input("Diaconia", value=None, key="di9")
-        me9 = s2.number_input("Mesa", value=None, key="me9")
-        lo9 = s3.number_input("Louvor", value=None, key="lo9")
+        di9 = s1.number_input("Diaconia", value=None, step=1, key="di9")
+        me9 = s2.number_input("Mesa", value=None, step=1, key="me9")
+        lo9 = s3.number_input("Louvor", value=None, step=1, key="lo9")
         
         st.markdown('<div class="pib-faixa">🎒 MI (Ministério Infantil)</div>', unsafe_allow_html=True)
         mi1, mi2, mi3 = st.columns(3)
-        mic9 = mi1.number_input("Crianças", value=None, key="mic9")
-        mis9 = mi2.number_input("Servos", value=None, key="mis9")
-        mip9 = mi3.number_input("Pai/Mãe", value=None, key="mip9")
+        mic9 = mi1.number_input("Crianças", value=None, step=1, key="mic9")
+        mis9 = mi2.number_input("Servos", value=None, step=1, key="mis9")
+        mip9 = mi3.number_input("Pai/Mãe", value=None, step=1, key="mip9")
         
         st.markdown('<div class="pib-faixa">🎮 MPA (Pré-Adolescente)</div>', unsafe_allow_html=True)
         mp1, mp2, mp3 = st.columns(3)
-        mpac9 = mp1.number_input("Crianças ", value=None, key="mpac9")
-        mpas9 = mp2.number_input("Servos ", value=None, key="mpas9")
-        mpap9 = mp3.number_input("Pai/Mãe ", value=None, key="mpap9")
+        mpac9 = mp1.number_input("Crianças ", value=None, step=1, key="mpac9")
+        mpas9 = mp2.number_input("Servos ", value=None, step=1, key="mpas9")
+        mpap9 = mp3.number_input("Pai/Mãe ", value=None, step=1, key="mpap9")
         
         st.markdown('<div class="pib-faixa">📚 Ebed</div>', unsafe_allow_html=True)
-        eb9 = st.number_input("Total Ebed", value=None, key="eb9", label_visibility="collapsed")
+        eb9 = st.number_input("Total Ebed", value=None, step=1, key="eb9", label_visibility="collapsed")
 
     # --- CULTO 11:00 ---
     with st.expander("🟢 CULTO DAS 11:00h - Preencher Dados", expanded=False):
@@ -109,31 +109,30 @@ else:
         
         st.markdown('<div class="pib-faixa faixa-center">Compareceram</div>', unsafe_allow_html=True)
         c4, c5, c6 = st.columns(3)
-        t11 = c4.number_input("Templo/Mezanino  ", value=None, key="t11")
-        v11 = c5.number_input("Visitantes  ", value=None, key="v11")
-        s11 = c6.number_input("Sexto andar  ", value=None, key="s11")
+        t11 = c4.number_input("Templo/Mezanino  ", value=None, step=1, key="t11")
+        v11 = c5.number_input("Visitantes  ", value=None, step=1, key="v11")
+        s11 = c6.number_input("Sexto andar  ", value=None, step=1, key="s11")
         
         st.markdown('<div class="pib-faixa">🛠️ Servindo</div>', unsafe_allow_html=True)
         s4, s5, s6 = st.columns(3)
-        di11 = s4.number_input("Diaconia  ", value=None, key="di11")
-        me11 = s5.number_input("Mesa  ", value=None, key="me11")
-        lo11 = s6.number_input("Louvor  ", value=None, key="lo11")
+        di11 = s4.number_input("Diaconia  ", value=None, step=1, key="di11")
+        me11 = s5.number_input("Mesa  ", value=None, step=1, key="me11")
+        lo11 = s6.number_input("Louvor  ", value=None, step=1, key="lo11")
 
         st.markdown('<div class="pib-faixa">🎒 MI (Ministério Infantil)</div>', unsafe_allow_html=True)
         mi4, mi5, mi6 = st.columns(3)
-        mic11 = mi4.number_input("Crianças  ", value=None, key="mic11")
-        mis11 = mi5.number_input("Servos  ", value=None, key="mis11")
-        mip11 = mi6.number_input("Pai/Mãe  ", value=None, key="mip11")
+        mic11 = mi4.number_input("Crianças  ", value=None, step=1, key="mic11")
+        mis11 = mi5.number_input("Servos  ", value=None, step=1, key="mis11")
+        mip11 = mi6.number_input("Pai/Mãe  ", value=None, step=1, key="mip11")
 
         st.markdown('<div class="pib-faixa">🎓 Classe Batismo</div>', unsafe_allow_html=True)
         ba1, ba2, ba3 = st.columns(3)
-        bj = ba1.number_input("Jovens", value=None, key="bj")
-        ba = ba2.number_input("Adultos", value=None, key="ba")
-        bs = ba3.number_input("Servos   ", value=None, key="bs")
+        bj = ba1.number_input("Jovens", value=None, step=1, key="bj")
+        ba = ba2.number_input("Adultos", value=None, step=1, key="ba")
+        bs = ba3.number_input("Servos   ", value=None, step=1, key="bs")
 
     # --- CÁLCULOS ---
-    # Lógica para tratar None como 0
-    def nz(value): return value if value is not None else 0
+    def nz(value): return int(value) if value is not None else 0
 
     t_c9, t_s9, t_mi9, t_mpa9 = (nz(t9)+nz(v9)+nz(s9)), (nz(di9)+nz(me9)+nz(lo9)), (nz(mic9)+nz(mis9)+nz(mip9)), (nz(mpac9)+nz(mpas9)+nz(mpap9))
     total_9h = t_c9 + t_s9 + t_mi9 + t_mpa9 + nz(eb9)
