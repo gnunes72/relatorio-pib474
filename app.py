@@ -3,7 +3,7 @@ from datetime import date
 import urllib.parse
 import os
 
-# --- CONFIGURAÇÃO DA PÁGINA (VERSÃO 1.0) ---
+# --- CONFIGURAÇÃO DA PÁGINA (VERSÃO 1.1) ---
 st.set_page_config(
     page_title="Relatório PIB Floripa",
     page_icon="⛪", 
@@ -44,6 +44,10 @@ st.markdown("""
         align-items: center !important; justify-content: center !important;
         text-decoration: none !important; margin-top: 10px;
     }
+    .btn-sair>button {
+        background-color: #f44336 !important; /* Vermelho para o botão sair */
+        margin-top: 30px !important;
+    }
     .wa-confirm { background-color: #e8f5e9; padding: 20px; border-radius: 12px; border: 2px solid #2e7d32; text-align: center; font-size: 20px; }
     </style>
     """, unsafe_allow_html=True)
@@ -58,7 +62,7 @@ with col_logo:
     if os.path.exists("logo.png"): st.image("logo.png", width=110)
 with col_nome:
     st.markdown('<p class="pib-header-title">PIB FLORIPA</p>', unsafe_allow_html=True)
-    st.markdown('<p class="pib-header-subtitle">v1.0 - Oficial</p>', unsafe_allow_html=True)
+    st.markdown('<p class="pib-header-subtitle">v1.1 - Sistema de Contagem</p>', unsafe_allow_html=True)
 
 # --- LOGIN CENTRALIZADO ---
 if not st.session_state.autenticado:
@@ -71,11 +75,8 @@ if not st.session_state.autenticado:
             st.rerun()
         else: st.error("Senha incorreta.")
 else:
-    # Botão Sair discreto
-    if st.button("🚪 Sair do Sistema"):
-        st.session_state.autenticado = False
-        st.rerun()
-
+    st.markdown("---")
+    
     # --- CULTO 09:00 ---
     with st.expander("🟢 CULTO DAS 09:00h", expanded=False):
         r9 = st.text_input("Responsável (9h)", placeholder="Nome...", key="res9")
@@ -154,4 +155,14 @@ TOTAL GERAL DOMINGO: {total_9h + total_11h}"""
         st.markdown('<div class="wa-confirm">Enviar para o grupo?</div>', unsafe_allow_html=True)
         wa_url = f"https://wa.me/?text={urllib.parse.quote(rel_final)}"
         st.markdown(f'<a href="{wa_url}" target="_blank" class="btn-pib-custom">Confirmar Envio</a>', unsafe_allow_html=True)
+    
     if st.session_state.mostrar_relatorio: st.code(rel_final, language="text")
+
+    # --- BOTÃO SAIR NO FINAL (Ajuste v1.1) ---
+    st.markdown('<div class="btn-sair">', unsafe_allow_html=True)
+    if st.button("🚪 Sair do Sistema"):
+        st.session_state.autenticado = False
+        st.session_state.wa_confirmar = False
+        st.session_state.mostrar_relatorio = False
+        st.rerun()
+    st.markdown('</div>', unsafe_allow_html=True)
