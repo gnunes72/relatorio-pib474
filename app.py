@@ -3,21 +3,10 @@ from datetime import date
 import urllib.parse
 import os
 
-# ==============================================================================
-# --- CORREÇÃO PARTE 1: LOGO E CONFIGURAÇÃO DA PÁGINA ---
-# Esta função define o ícone que aparece na aba do navegador e ao instalar como app.
-# Substituímos o barquinho padrão pelo emoji de igreja, pois o Streamlit Cloud
-# não permite usar uma imagem local como ícone de aba sem configurações complexas.
-# O emoji de igreja ⛪ já melhora muito a identificação.
-# ==============================================================================
-st.set_page_config(
-    page_title="Relatório PIB Floripa",
-    page_icon="⛪",  # Ícone que aparece na aba/instalação
-    layout="centered",
-    initial_sidebar_state="collapsed" # CORREÇÃO PARTE 2: Força o menu lateral a iniciar fechado
-)
+# --- CONFIGURAÇÃO DA PÁGINA ---
+st.set_page_config(page_title="Relatório PIB Floripa", page_icon="⛪", layout="centered")
 
-# --- DESIGN E ESTILIZAÇÃO CSS (Sem alterações, apenas para manter o layout bonito) ---
+# --- DESIGN E ESTILIZAÇÃO CSS ---
 st.markdown("""
     <style>
     html, body, [class*="st-"] {
@@ -63,7 +52,6 @@ st.markdown("""
         font-size: 20px !important;
     }
 
-    /* Estilo para simular o campo de data desativado mas funcional */
     .fake-date-input {
         height: 55px;
         background-color: #f0f2f6;
@@ -101,48 +89,30 @@ if 'autenticado' not in st.session_state: st.session_state.autenticado = False
 if 'mostrar_relatorio' not in st.session_state: st.session_state.mostrar_relatorio = False
 if 'wa_confirmar' not in st.session_state: st.session_state.wa_confirmar = False
 
-# ==============================================================================
-# --- CORREÇÃO PARTE 2: FLUXO DE AUTENTICAÇÃO CENTRALIZADO ---
-# Removi a autenticação do menu lateral (`with st.sidebar:`) e coloquei
-# direto na tela principal (`st.`). Isso garante que ela nunca fique "escondida".
-# ==============================================================================
-
-# Cabeçalho (Sempre visível para dar contexto)
+# --- CABEÇALHO ---
 col_logo, col_nome = st.columns([1, 3.5])
 with col_logo:
-    # Mostra a logo local se ela existir no GitHub
     if os.path.exists("logo.png"): st.image("logo.png", width=110)
 with col_nome:
     st.markdown('<p class="pib-header-title">PIB FLORIPA</p>', unsafe_allow_html=True)
-    st.markdown('<p class="pib-header-subtitle">Primeira Igreja Batista de Florianópolis</p>', unsafe_allow_html=True)
+    st.markdown('<p class="pib-header-subtitle">v1.2 - Sistema de Contagem</p>', unsafe_allow_html=True)
 
+# --- LÓGICA DE ACESSO CENTRALIZADA ---
 if not st.session_state.autenticado:
-    # Centraliza o login na tela principal
     st.markdown("---")
-    st.markdown("### 🔐 Área Restrita - Voluntários")
-    senha = st.text_input("Digite a senha de acesso:", type="password")
-    if st.button("Entrar", key="btn_login_main"):
+    st.markdown("### 🔐 Autenticação")
+    senha = st.text_input("Digite a senha para acessar o formulário:", type="password")
+    if st.button("Entrar"):
         if senha.upper() == "PIB474":
             st.session_state.autenticado = True
             st.rerun()
         else:
-            st.error("Senha incorreta. Tente novamente.")
-            
-    # Cria um espaço vazio para empurrar o login para cima no celular
-    st.markdown("<br><br><br>", unsafe_allow_html=True)
-
+            st.error("Senha incorreta")
 else:
-    # --- CONTEÚDO DO APLICATIVO (Liberado após a senha correta) ---
+    # Conteúdo Principal após Login
     st.markdown("---")
     
-    # Botão de Sair (agora em um local discreto na tela principal)
-    col_vazia, col_sair = st.columns([4, 1])
-    with col_sair:
-        if st.button("🚪 Sair", key="btn_logout_main"):
-            st.session_state.autenticado = False
-            st.rerun()
-    
-    # --- CULTO 09:00 (Mesma lógica de antes) ---
+    # --- CULTO 09:00 ---
     with st.expander("🟢 CULTO DAS 09:00h - Preencher Dados", expanded=False):
         r9 = st.text_input("Responsável pela contagem (9h)", placeholder="Nome...", key="res9")
         d9_input = st.date_input("Data", value=None, format="DD/MM/YYYY", key="data_contagem_main")
@@ -166,7 +136,7 @@ else:
         st.markdown('<div class="pib-faixa">📚 Ebed</div>', unsafe_allow_html=True)
         eb9 = st.number_input("Total Ebed", 0, key="eb9", label_visibility="collapsed")
 
-    # --- CULTO 11:00 (Mesma lógica de antes) ---
+    # --- CULTO 11:00 ---
     with st.expander("🟢 CULTO DAS 11:00h - Preencher Dados", expanded=False):
         r11 = st.text_input("Responsável pela contagem (11h)", placeholder="Nome...", key="res11")
         d_formatada = d9_input.strftime('%d/%m/%Y') if d9_input else "DD/MM/YYYY"
@@ -189,9 +159,8 @@ else:
         ba1, ba2, ba3 = st.columns(3)
         bj, ba, bs = ba1.number_input("Jovens", 0, key="bj"), ba2.number_input("Adultos", 0, key="ba"), ba3.number_input("Servos ", 0, key="bs")
 
-    # --- CÁLCULOS E RELATÓRIO (Sem alterações) ---
+    # --- CÁLCULOS E RELATÓRIO ---
     d_relatorio = d9_input.strftime('%d/%m/%Y') if d9_input else "dd/mm/aaaa"
-    
     t_c9, t_s9, t_mi9, t_mpa9 = (t9+v9+s9), (di9+me9+lo9), (mic9+mis9+mip9), (mpac9+mpas9+mpap9)
     total_9h = t_c9 + t_s9 + t_mi9 + t_mpa9 + eb9
     t_c11, t_s11, t_mi11, t_bat = (t11+v11+s11), (di11+me11+lo11), (mic11+mis11+mip11), (bj+ba+bs)
@@ -233,8 +202,33 @@ TOTAL DO CULTO DAS 9:00hrs: {total_9h}
 Culto das 11:00hrs
 Responsável pela contagem: {r11}
 Data: {d_relatorio}
-... (Restante do relatório cortado para economizar espaço na visualização do código, mas deve ser mantido completo)
-...
+
+Compareceram
+Templo e mezanino: {t11}
+Visitantes: {v11}
+Sexto andar: {s11}
+Total: {t_c11}
+
+Servindo:
+Diaconia: {di11}
+Mesa: {me11}
+Louvor: {lo11}
+Total: {t_s11}
+
+MI:
+Crianças: {mic11}
+Servos: {mis11}
+Pai/Mãe: {mip11}
+Total: {t_mi11}
+
+Classe batismo:
+Jovens: {bj}
+Adultos: {ba}
+Servos: {bs}
+Total: {t_bat}
+
+TOTAL DO CULTO DAS 11:00hrs: {total_11h}
+
 TOTAL GERAL: {total_9h + total_11h}"""
 
     st.markdown("---")
@@ -251,3 +245,9 @@ TOTAL GERAL: {total_9h + total_11h}"""
 
     if st.session_state.mostrar_relatorio:
         st.code(rel_final, language="text")
+
+    # Botão Sair opcional no rodapé
+    st.markdown("<br><br>", unsafe_allow_html=True)
+    if st.button("🚪 Sair do Sistema"):
+        st.session_state.autenticado = False
+        st.rerun()
